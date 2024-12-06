@@ -15,9 +15,9 @@ export const register = async (req, res) => {
         const existingUser = await userModel.findOne({ email })
 
         if (existingUser) {
-            res.json({ success: false, message: "User already exists" });
-            JWT_SECRET
+            return res.json({ success: false, message: "User already exists" });
         }
+        
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -77,13 +77,12 @@ export const login = async (req,res)=>{
 
 export const logout = async (req,res)=>{
     try {
-        res.clearCookie('token', token, {
-            httpOnly:true,
+        res.clearCookie('token', {
+            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 
-            'none' : 'strict',
-            
-        })
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        });
+        
         return res.json({success:true,message:"Logged Out"});
     } catch (error) {
         res.json({ success: false, message: error.message });
