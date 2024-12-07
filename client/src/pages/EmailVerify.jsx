@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 const EmailVerify = () => {
   axios.defaults.withCredentials = true;
-  const { backendUrl, getUserData } = useContext(AppContext);
+  const { backendUrl, isLoggedin, userData, getUserData } = useContext(AppContext);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
 
@@ -51,7 +51,7 @@ const EmailVerify = () => {
 
       const otp = otpArray.join('');
       const { data } = await axios.post(backendUrl + '/api/auth/verify-account', { otp });
-      // console.log(data); 
+
       if (data.success) {
         toast.success(data.message);
         getUserData();
@@ -63,6 +63,13 @@ const EmailVerify = () => {
       toast.error(error.response?.data?.message || 'Something went wrong. Please try again.');
     }
   };
+
+  // Redirect if user is already logged in and account is verified
+  useEffect(() => {
+    if (isLoggedin && userData && userData.isAccountVerified) {
+      navigate('/');
+    }
+  }, [isLoggedin, userData, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-blue-200 to-purple-400">
