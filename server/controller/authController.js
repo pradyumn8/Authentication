@@ -133,22 +133,22 @@ export const sendVerifyOtp = async (req,res)=>{
     }
 }
 
-export const verifyEmail = async (req,res)=>{
-    const {userId, otp} = req.body;
+export const verifyEmail = async (req, res) => {
+    const { userId, otp } = req.body;
 
-    if(!userId || !otp){
-        return res.json({success:false,message: 'Missing Details'});
+    if (!userId || !otp) {
+        return res.json({ success: false, message: 'Missing Details' });
     }
     try {
         const user = await userModel.findById(userId);
-        if(!user){
-            return res.json({ success: false,message:'User not found' });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
         }
         if (user.verifyOtp === '' || user.verifyOtp !== otp) {
-            return res.json({success:false,message:'Invalid OTP'});
+            return res.json({ success: false, message: 'Invalid OTP' });
         }
-        if(user.verifyOtpExpireAt < Date.now()){
-            return res.json({success:false,message:'OTP Expired'});
+        if (user.verifyOtpExpireAt < Date.now()) {
+            return res.json({ success: false, message: 'OTP Expired' });
         }
 
         user.isAccountVerified = true;
@@ -156,11 +156,13 @@ export const verifyEmail = async (req,res)=>{
         user.verifyOtpExpireAt = 0;
 
         await user.save();
-        return res.json
+
+        // Proper response for success
+        return res.json({ success: true, message: 'Account verified successfully' });
     } catch (error) {
-        return res.json({ success: false, message:error.message});
+        return res.json({ success: false, message: error.message });
     }
-}
+};
 
 // check if user is authenticated
 export const isAuthenticated = async (req,res)=>{
